@@ -8,19 +8,21 @@
 #include <sched.h>
 #include <unistd.h>
 
+#include <getopt.h>
+
 //Definiciones
 #define BUF_SIZE 10
-#define FIRST_PORT 1820
+#define DEFAULT_PORT 1820
 
 //Variables
 int first_pack = 0;
 struct timeval dateInicio, dateFin;
 pthread_mutex_t lock;
 int mostrarInfo = 0;
-int distribuiteCPUs = 1;
+int distribuiteCPUs = 0;
 int MAX_PACKS = 1;
 int NTHREADS = 1;
-int DESTINATION_PORT = FIRST_PORT;
+int DESTINATION_PORT = DEFAULT_PORT;
 double segundos;
 
 llamadaHilo(int socket_fd){
@@ -56,28 +58,82 @@ llamadaHilo(int socket_fd){
 	if(mostrarInfo) printf("Fin Socket Operativo: %d, \t CPU: %d\n", socket_fd, actualCPU);
 }
 
+void print_usage(){
+    printf("Uso: server [cpudistributed] [verbose] -packets num -threads num -port num\n");
+}
+
+void print_config(){
+    printf("Detalles de la prueba:\n");
+    printf("\tPuerto a escuchar:\t%d\n", DESTINATION_PORT);
+    printf("\tPaquetes a enviar:\t%d\n", MAX_PACKS);
+    printf("\tThreads que compartirán el socket:\t%d\n", NTHREADS);
+    printf("\tDistribución de Threads:\t");
+    distribuiteCPUs ? printf("Manual\n") : printf("Por SO\n");
+
+}
+
 int main(int argc, char **argv){
-	//Verificar Parametros Entrada
-	if(argc <4){
-		fprintf(stderr,"Syntax Error: Esperado: ./server MAX_PACKS NTHREADS DESTINATION_PORT\n");
-		exit(1);
+
+	// Parsear argumentos
+	int c;
+	int digit_optind = 0;
+	while (1){
+
+		int this_option_optind = optind ? optind : 1;
+        int option_index = 0;
+
+		static struct option long_options[] = {
+			{"packets", required_argument, 0, 'd'},
+			{"threads", required_argument, 0, 't'},
+			{"port", required_argument, 0, 'p'},
+			{"cpudistributed", no_argument, 0, 'c'},
+			{"verbose", no_argument, 0, 'v'},
+			{0, 0, 0, 0}
+		};
+
+         c = getopt_long (argc, argv, "cvd:t:p:",
+         long_options, &option_index);
+ 
+         if (c == -1)
+         	break; 
+
+         switch (c){
+
+			case 'c':
+				distribuiteCPUs = 1;
+				break;
+
+			case 'v':
+				printf ("Modo Verboso\n");
+				mostrarInfo = 1;
+				break;
+
+			case 'd':
+				MAX_PACKS = atoi(optarg);
+				break;
+
+			case 't':
+				NTHREADS = atoi(optarg);
+				break;
+
+			case 'p':
+				DESTINATION_PORT = atoi(optarg);
+				break;
+
+			default:
+				printf("Error: La función getopt_long ha retornado un carácter desconocido. El carácter es = %c\n", c);
+				print_usage();
+				exit(1);
+         }
 	}
 
-	//Recuperar PID
-	int pid = getpid();	
+	if(mostrarInfo)	print_config();
+
+	// Recuperar PID
+	int pid = getpid();
 	if(mostrarInfo)	printf("El pid es %d\n", pid);
 
-	//Recuperar total de paquetes a enviar
-	MAX_PACKS = atoi(argv[1]);
-
-	//Recuperar numero de Threads
-	NTHREADS = atoi(argv[2]);
-	pthread_t pids[NTHREADS];
-
-	//Recuperar puerto destino
-	DESTINATION_PORT = atoi(argv[3]);
-
-	//Info
+	// Recuperar Total CPUs
 	int totalCPUs = sysconf(_SC_NPROCESSORS_ONLN);
 	if(mostrarInfo) printf("Total de Procesadores disponibles: %d\n", totalCPUs);	
 
@@ -92,9 +148,9 @@ int main(int argc, char **argv){
 	}
 
 	pthread_mutex_init(&lock, NULL);
-	if(mostrarInfo)	printf("Usando %d threads, %d packs\n", NTHREADS, MAX_PACKS);
 
 	//Configurar Threads
+	pthread_t pids[NTHREADS];
     pthread_attr_t attr;
     cpu_set_t cpus;
     pthread_attr_init(&attr);	
