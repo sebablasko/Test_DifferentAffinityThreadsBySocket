@@ -129,6 +129,7 @@ int main(int argc, char **argv){
 
 	// Validar Parametros necesarios para operar
 	if(MAX_PACKS < 1 || NTHREADS < 1){
+		printf("Error en el ingreso de parametros\n");
 		print_usage();
 		exit(1);
 	}

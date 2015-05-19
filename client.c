@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../ssocket/ssocket.h"
 
 #include <getopt.h>
@@ -15,7 +16,7 @@
 int first_pack = 0;
 struct timeval dateInicio, dateFin;
 char buf[BUF_SIZE];
-char* IP_DEST;
+char* IP_DEST = "";
 int mostrarInfo = 0;
 int MAX_PACKS = 0;
 int DESTINATION_PORT = FIRST_PORT;
@@ -83,7 +84,8 @@ main(int argc, char **argv) {
 	}
 
 	// Validar Parametros necesarios para operar
-	if(MAX_PACKS < 1 || !*IP_DEST){
+	if(MAX_PACKS < 1 || strlen(IP_DEST)==0) {
+		printf("Error en el ingreso de parametros\n");
 		print_usage();
 		exit(1);
 	}
