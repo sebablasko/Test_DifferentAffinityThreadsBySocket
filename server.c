@@ -20,8 +20,8 @@ struct timeval dateInicio, dateFin;
 pthread_mutex_t lock;
 int mostrarInfo = 0;
 int distribuiteCPUs = 0;
-int MAX_PACKS = 1;
-int NTHREADS = 1;
+int MAX_PACKS = 0;
+int NTHREADS = 0;
 int DESTINATION_PORT = DEFAULT_PORT;
 double segundos;
 
@@ -59,13 +59,13 @@ llamadaHilo(int socket_fd){
 }
 
 void print_usage(){
-    printf("Uso: server [cpudistributed] [verbose] -packets num -threads num -port num\n");
+    printf("Uso: ./server [cpudistributed] [verbose] --packets <num> --threads <num> --port <num>\n");
 }
 
 void print_config(){
     printf("Detalles de la prueba:\n");
     printf("\tPuerto a escuchar:\t%d\n", DESTINATION_PORT);
-    printf("\tPaquetes a enviar:\t%d\n", MAX_PACKS);
+    printf("\tPaquetes a recibir:\t%d\n", MAX_PACKS);
     printf("\tThreads que compartirán el socket:\t%d\n", NTHREADS);
     printf("\tDistribución de Threads:\t");
     distribuiteCPUs ? printf("Manual\n") : printf("Por SO\n");
@@ -125,6 +125,12 @@ int main(int argc, char **argv){
 				print_usage();
 				exit(1);
          }
+	}
+
+	// Validar Parametros necesarios para operar
+	if(MAX_PACKS < 1 || NTHREADS < 1){
+		print_usage();
+		exit(1);
 	}
 
 	if(mostrarInfo)	print_config();
