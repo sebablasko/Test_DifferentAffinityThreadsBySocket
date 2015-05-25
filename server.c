@@ -168,6 +168,7 @@ int main(int argc, char **argv){
 		CPU_ZERO(&cpus);
 		CPU_SET(i%totalCPUs, &cpus);
 		pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
+		//pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
 		
 		if(distribuiteCPUs){
 			pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);
