@@ -24,6 +24,7 @@ int MAX_PACKS = 0;
 int NTHREADS = 0;
 int DESTINATION_PORT = DEFAULT_PORT;
 double segundos;
+char* schedulerOpt;
 
 llamadaHilo(int socket_fd){
 	char buf[BUF_SIZE];
@@ -67,6 +68,7 @@ void print_config(){
     printf("\tPuerto a escuchar:\t%d\n", DESTINATION_PORT);
     printf("\tPaquetes a recibir:\t%d\n", MAX_PACKS);
     printf("\tThreads que compartirán el socket:\t%d\n", NTHREADS);
+    printf("\tScheduler:\t\n");
     printf("\tDistribución de Threads:\t");
     distribuiteCPUs ? printf("Manual\n") : printf("Por SO\n");
 
@@ -86,6 +88,7 @@ int main(int argc, char **argv){
 			{"packets", required_argument, 0, 'd'},
 			{"threads", required_argument, 0, 't'},
 			{"port", required_argument, 0, 'p'},
+			{"scheduler", required_argument, 0, 's'},
 			{"cpudistributed", no_argument, 0, 'c'},
 			{"verbose", no_argument, 0, 'v'},
 			{0, 0, 0, 0}
@@ -118,6 +121,10 @@ int main(int argc, char **argv){
 
 			case 'p':
 				DESTINATION_PORT = atoi(optarg);
+				break;
+
+			case 's':
+				schedulerOpt = optarg;
 				break;
 
 			default:
