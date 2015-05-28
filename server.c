@@ -173,13 +173,13 @@ int main(int argc, char **argv){
 			pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);
 		}else{
 			pthread_create(&pids[i], NULL, llamadaHilo, socket_fd);
-		}		
+		}
 
 
 	}
 
 	//Esperar Threads
-	for(i=0; i < NTHREADS; i++) 
+	for(i=0; i < NTHREADS; i++)
 		pthread_join(pids[i], NULL);
 
 	//Medir Fin
