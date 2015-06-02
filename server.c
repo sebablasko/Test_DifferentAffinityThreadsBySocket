@@ -27,9 +27,9 @@ int MAX_PACKS = 0;
 int NTHREADS = 0;
 int DESTINATION_PORT = DEFAULT_PORT;
 double segundos;
-char* schedu;
+char* schedu = "";
 
-llamadaHilo(int socket_fd){
+int llamadaHilo(int socket_fd){
 	char buf[BUF_SIZE];
 	int lectura;
 
@@ -90,7 +90,7 @@ int main(int argc, char **argv){
 			{"packets", required_argument, 0, 'd'},
 			{"threads", required_argument, 0, 't'},
 			{"port", required_argument, 0, 'p'},
-			{"scheduller", required_argument, 0, 's'},
+			{"scheduler", required_argument, 0, 's'},
 			//{"cpudistributed", no_argument, 0, 'c'},
 			{"verbose", no_argument, 0, 'v'},
 			{0, 0, 0, 0}
