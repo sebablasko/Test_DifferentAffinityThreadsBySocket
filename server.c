@@ -176,16 +176,19 @@ int main(int argc, char **argv){
 	for(i=0; i < NTHREADS; i++) {
 
 		if(strcmp(schedu,equitativeSched)==0){
+				// Caso afinidad equitativa de threads entre las cpu
 				CPU_ZERO(&cpus);
 				CPU_SET(i%totalCPUs, &cpus);
 				pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
 				pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);
 		}else if(strcmp(schedu,noSched)==0){
+				// Caso afinidad rigida, todos los threads a cpu 0
 				CPU_ZERO(&cpus);
 				CPU_SET(0, &cpus);
 				pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
 				pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);				
 		}else{
+				// Caso sin afinidad, el sistema administra la afinidad
 				pthread_create(&pids[i], NULL, llamadaHilo, socket_fd);
 		}
 
