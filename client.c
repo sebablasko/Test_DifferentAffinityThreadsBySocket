@@ -33,7 +33,7 @@ void print_config(){
     printf("\tPuerto a enviar:\t%d\n", DESTINATION_PORT);
 }
 
-main(int argc, char **argv) {
+int main(int argc, char **argv) {
 
 	// Parsear argumentos
 	int c;
@@ -132,4 +132,5 @@ main(int argc, char **argv) {
 		printf("%g \n", segundos);
 	}
 	exit(0);
+	return 0;
 }
