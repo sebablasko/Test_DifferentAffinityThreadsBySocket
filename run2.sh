@@ -3,7 +3,7 @@
 MAX_PACKS=1000000
 repetitions=6
 num_port=1820
-threads=(1 2 4 6 8 10)
+threads=(1 2 4 8 16 24 36 48 60)
 num_clients=4
 
 
