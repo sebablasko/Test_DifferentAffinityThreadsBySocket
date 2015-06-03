@@ -191,7 +191,7 @@ int main(int argc, char **argv){
 		}else if(strcmp(schedu,pairSched)==0){
 				// Caso afinidad rigida, todos los threads a cpu 0
 				CPU_ZERO(&cpus);
-				CPU_SET((i+(i%2))%totalCPUs, &cpus);
+				CPU_SET((2*i)%totalCPUs, &cpus);
 				pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
 				pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);				
 		}else{
