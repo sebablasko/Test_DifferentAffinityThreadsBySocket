@@ -15,7 +15,8 @@
 #define BUF_SIZE 10
 #define DEFAULT_PORT 1820
 #define equitativeSched "equitativeSched"
-#define noSched "noSched"
+#define dummySched "dummySched"
+#define pairSched "pairSched"
 
 //Variables
 int first_pack = 0;
@@ -181,10 +182,16 @@ int main(int argc, char **argv){
 				CPU_SET(i%totalCPUs, &cpus);
 				pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
 				pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);
-		}else if(strcmp(schedu,noSched)==0){
+		}else if(strcmp(schedu,dummySched)==0){
 				// Caso afinidad rigida, todos los threads a cpu 0
 				CPU_ZERO(&cpus);
 				CPU_SET(0, &cpus);
+				pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
+				pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);				
+		}else if(strcmp(schedu,pairSched)==0){
+				// Caso afinidad rigida, todos los threads a cpu 0
+				CPU_ZERO(&cpus);
+				CPU_SET((i+(i%2))%totalCPUs, &cpus);
 				pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
 				pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);				
 		}else{
