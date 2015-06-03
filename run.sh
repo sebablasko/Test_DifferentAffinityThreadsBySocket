@@ -8,11 +8,11 @@ MAX_PACKS=10000000
 
 
 num_port=1820
-num_threads=4
+num_threads=9
 num_clients=4
 
 #./server --verbose --cpudistributed --packets $MAX_PACKS --threads $num_threads --port $num_port &
-./server --scheduller no --packets $MAX_PACKS --threads $num_threads --port $num_port &
+./server --verbose --scheduler pairSched --packets $MAX_PACKS --threads $num_threads --port $num_port &
 
 pid=$!
 sleep 1
