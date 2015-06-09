@@ -17,6 +17,7 @@
 #define equitativeSched "equitativeSched"
 #define dummySched "dummySched"
 #define pairSched "pairSched"
+#define impairSched "impairSched"
 
 //Variables
 int first_pack = 0;
@@ -187,13 +188,19 @@ int main(int argc, char **argv){
 				CPU_ZERO(&cpus);
 				CPU_SET(0, &cpus);
 				pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
-				pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);				
+				pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);
 		}else if(strcmp(schedu,pairSched)==0){
-				// Caso afinidad rigida, todos los threads a cpu 0
+				// Caso afinidad cpu pares
 				CPU_ZERO(&cpus);
 				CPU_SET((2*i)%totalCPUs, &cpus);
 				pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
-				pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);				
+				pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);
+		}else if(strcmp(schedu,impairSched)==0){
+				// Caso afinidad cpu impares
+				CPU_ZERO(&cpus);
+				CPU_SET((2*i+1)%totalCPUs, &cpus);
+				pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
+				pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);
 		}else{
 				// Caso sin afinidad, el sistema administra la afinidad
 				pthread_create(&pids[i], NULL, llamadaHilo, socket_fd);
