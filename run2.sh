@@ -1,9 +1,9 @@
 #!/bin/bash
 
 MAX_PACKS=1000000
-repetitions=30
+repetitions=20
 num_port=1820
-threads=(1 2 4 8 16 24 36 48 60)
+threads=(1 2 4 8 16 24 36 48 64)
 num_clients=4
 
 
@@ -78,6 +78,25 @@ do
 	for ((i=1 ; $i<=$repetitions ; i++))
 	{
 		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads --scheduler pairSched
+		
+		linea="$linea$(cat aux)"
+		rm aux
+	}
+
+	echo "$linea" >> $salida".csv"
+done
+
+
+#Con processor Affinity Numa pair
+salida=NumaPairAffinity
+for num_threads in ${threads[@]};
+do
+	echo "evaluando "$num_threads" threads, "$salida
+	linea="$num_threads,";
+
+	for ((i=1 ; $i<=$repetitions ; i++))
+	{
+		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads --scheduler numaPairSched
 		
 		linea="$linea$(cat aux)"
 		rm aux
