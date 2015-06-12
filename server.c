@@ -18,6 +18,7 @@
 #define dummySched "dummySched"
 #define pairSched "pairSched"
 #define impairSched "impairSched"
+#define numaPairSched "numaPairSched"
 
 //Variables
 int first_pack = 0;
@@ -199,6 +200,14 @@ int main(int argc, char **argv){
 				// Caso afinidad cpu impares
 				CPU_ZERO(&cpus);
 				CPU_SET((2*i+1)%totalCPUs, &cpus);
+				pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
+				pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);
+		}else if(strcmp(schedu,numaPairSched)==0){
+				// Caso afinidad cpu pares considerando numeración para aprovechar numa mejor
+				int j;
+				j = (i%2)==0 ? 2*i : 2*(i-1) + totalCPUs;
+				CPU_ZERO(&cpus);
+				CPU_SET(j%totalCPUs, &cpus);
 				pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
 				pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);
 		}else{
