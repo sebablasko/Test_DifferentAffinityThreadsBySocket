@@ -205,7 +205,7 @@ int main(int argc, char **argv){
 		}else if(strcmp(schedu,numaPairSched)==0){
 				// Caso afinidad cpu pares considerando numeración para aprovechar numa mejor
 				int j;
-				j = (i%2)==0 ? 2*i : 2*(i-1) + totalCPUs;
+				j = (i%2)==0 ? i : (i-1) + totalCPUs/2;
 				CPU_ZERO(&cpus);
 				CPU_SET(j%totalCPUs, &cpus);
 				pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
