@@ -169,7 +169,7 @@ int main(int argc, char **argv){
 	char ports[10];
 	sprintf(ports, "%d", DESTINATION_PORT);
 
-	socket_fd = reuseport ? udp_bind(ports) : udp_bind_reuseport(ports);
+	socket_fd = reuseport ? udp_bind_reuseport(ports) : udp_bind(ports);
 	if(socket_fd < 0) {
 		fprintf(stderr, "Error de bind al tomar el puerto\n");
 		exit(1);
