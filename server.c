@@ -29,8 +29,9 @@ int distribuiteCPUs = 0;
 int MAX_PACKS = 0;
 int NTHREADS = 0;
 int DESTINATION_PORT = DEFAULT_PORT;
+int reuseport = 0;
 double segundos;
-char* schedu = "";
+char* schedu = "SO";
 
 int llamadaHilo(int socket_fd){
 	char buf[BUF_SIZE];
@@ -73,6 +74,8 @@ void print_config(){
     printf("Detalles de la prueba:\n");
     printf("\tPuerto a escuchar:\t%d\n", DESTINATION_PORT);
     printf("\tPaquetes a recibir:\t%d\n", MAX_PACKS);
+    printf("\tUso de ReusePort:\t");
+    reuseport ? printf("Activado\n") : printf("Apagado\n");
     printf("\tThreads que compartirán el socket:\t%d\n", NTHREADS);
     printf("\tScheduller usado:\t%s\n",schedu);
     //printf("\tDistribución de Threads:\t");
@@ -95,6 +98,7 @@ int main(int argc, char **argv){
 			{"port", required_argument, 0, 'p'},
 			{"scheduler", required_argument, 0, 's'},
 			//{"cpudistributed", no_argument, 0, 'c'},
+			{"reuseport", no_argument, 0, 'r'},
 			{"verbose", no_argument, 0, 'v'},
 			{0, 0, 0, 0}
 		};
@@ -114,6 +118,10 @@ int main(int argc, char **argv){
 			case 'v':
 				printf ("Modo Verboso\n");
 				mostrarInfo = 1;
+				break;
+
+			case 'r':
+				reuseport = 1;
 				break;
 
 			case 'd':
@@ -160,7 +168,8 @@ int main(int argc, char **argv){
 	int socket_fd;
 	char ports[10];
 	sprintf(ports, "%d", DESTINATION_PORT);
-	socket_fd = udp_bind(ports);
+
+	socket_fd = reuseport ? udp_bind(ports) : udp_bind_reuseport(ports);
 	if(socket_fd < 0) {
 		fprintf(stderr, "Error de bind al tomar el puerto\n");
 		exit(1);
