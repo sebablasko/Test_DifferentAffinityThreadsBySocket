@@ -1,20 +1,26 @@
 #!/bin/bash
 
-echo "Compilando..."
-make all
-echo "Done"
+#echo "Compilando..."
+#make all
+#echo "Done"
 
 MAX_PACKS=10000000
 
-
-num_port=1820
-num_threads=19
+num_sockets=2
+num_threads_per_socket=2
 num_clients=4
+num_port=1820
 
 #./server --verbose --cpudistributed --packets $MAX_PACKS --threads $num_threads --port $num_port &
-./server --verbose --scheduler numaPairSched --packets $MAX_PACKS --threads $num_threads --port $num_port &
+#./server --verbose --packets $MAX_PACKS --threads $num_threads --port $num_port --reuseport &
 
-pid=$!
+#pid=$!
+
+for ((i=1 ; $i<=$num_sockets ; i++))
+{
+	./server --scheduler numaPairSched --packets $(($MAX_PACKS/num_sockets)) --threads $num_threads_per_socket --port $num_port --reuseport  &
+}
+
 sleep 1
 
 # for i in $(pgrep server); do ps -mo pid,tid,fname,user,psr,sgi_p,%cpu,c,class,sched,wchan -p $i;done > scan.txt
@@ -43,7 +49,8 @@ for ((i=1 ; $i<=$num_clients ; i++))
 	./client --packets $(($MAX_PACKS*10)) --ip 127.0.0.1 --port $num_port > /dev/null &
 }
 
-wait $pid
+#wait $pid
 #kill $scannPID
+wait $(pgrep 'server')
 
-make clean
+#make clean
