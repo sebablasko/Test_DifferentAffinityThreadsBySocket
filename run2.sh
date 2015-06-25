@@ -3,7 +3,7 @@
 MAX_PACKS=1000000
 repetitions=20
 num_port=1820
-threads=(1 2 4 8 16 24 36 48 64)
+threads=(1 2 4 8 16 24 36 48 64 128)
 num_clients=4
 
 
@@ -11,80 +11,80 @@ echo "Compilando..."
 make all
 echo "Done"
 
-# #Sin processor Affinity
-# salida=SinProcessorAffinity
-# for num_threads in ${threads[@]};
-# do
-# 	echo "evaluando "$num_threads" threads, "$salida
-# 	linea="$num_threads,";
+#Sin processor Affinity
+salida=SinProcessorAffinity
+for num_threads in ${threads[@]};
+do
+	echo "evaluando "$num_threads" threads, "$salida
+	linea="$num_threads,";
 
-# 	for ((i=1 ; $i<=$repetitions ; i++))
-# 	{
-# 		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads
+	for ((i=1 ; $i<=$repetitions ; i++))
+	{
+		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads
 		
-# 		linea="$linea$(cat aux)"
-# 		rm aux
-# 	}
+		linea="$linea$(cat aux)"
+		rm aux
+	}
 
-# 	echo "$linea" >> $salida".csv"
-# done
+	echo "$linea" >> $salida".csv"
+done
 
 
-# #Con processor Affinity equitative
-# salida=EquitativeAffinity
-# for num_threads in ${threads[@]};
-# do
-# 	echo "evaluando "$num_threads" threads, "$salida
-# 	linea="$num_threads,";
+#Con processor Affinity equitative
+salida=EquitativeAffinity
+for num_threads in ${threads[@]};
+do
+	echo "evaluando "$num_threads" threads, "$salida
+	linea="$num_threads,";
 
-# 	for ((i=1 ; $i<=$repetitions ; i++))
-# 	{
-# 		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads --scheduler equitativeSched
+	for ((i=1 ; $i<=$repetitions ; i++))
+	{
+		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads --scheduler equitativeSched
 		
-# 		linea="$linea$(cat aux)"
-# 		rm aux
-# 	}
+		linea="$linea$(cat aux)"
+		rm aux
+	}
 
-# 	echo "$linea" >> $salida".csv"
-# done
+	echo "$linea" >> $salida".csv"
+done
 
 
-# #Con processor Affinity dummy
-# salida=DummyAffinity
-# for num_threads in ${threads[@]};
-# do
-# 	echo "evaluando "$num_threads" threads, "$salida
-# 	linea="$num_threads,";
+#Con processor Affinity dummy
+salida=DummyAffinity
+for num_threads in ${threads[@]};
+do
+	echo "evaluando "$num_threads" threads, "$salida
+	linea="$num_threads,";
 
-# 	for ((i=1 ; $i<=$repetitions ; i++))
-# 	{
-# 		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads --scheduler dummySched
+	for ((i=1 ; $i<=$repetitions ; i++))
+	{
+		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads --scheduler dummySched
 		
-# 		linea="$linea$(cat aux)"
-# 		rm aux
-# 	}
+		linea="$linea$(cat aux)"
+		rm aux
+	}
 
-# 	echo "$linea" >> $salida".csv"
-# done
+	echo "$linea" >> $salida".csv"
+done
 
 
-# #Con processor Affinity pair
-# salida=PairAffinity
-# for num_threads in ${threads[@]};
-# do
-# 	echo "evaluando "$num_threads" threads, "$salida
-# 	linea="$num_threads,";
+#Con processor Affinity pair
+salida=PairAffinity
+for num_threads in ${threads[@]};
+do
+	echo "evaluando "$num_threads" threads, "$salida
+	linea="$num_threads,";
 
-# 	for ((i=1 ; $i<=$repetitions ; i++))
-# 	{
-# 		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads --scheduler pairSched
+	for ((i=1 ; $i<=$repetitions ; i++))
+	{
+		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads --scheduler pairSched
 		
-# 		linea="$linea$(cat aux)"
-# 		rm aux
-# 	}
+		linea="$linea$(cat aux)"
+		rm aux
+	}
 
-# 	echo "$linea" >> $salida".csv"
-# done
+	echo "$linea" >> $salida".csv"
+done
 
 
 #Con processor Affinity Numa pair
@@ -110,4 +110,4 @@ make clean
 echo "Done"
 
 
-# Compilar los resultados en un sólo csv para simplicidad
+#Compilar los resultados en un sólo csv para simplicidad
