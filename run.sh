@@ -1,56 +1,113 @@
 #!/bin/bash
 
-#echo "Compilando..."
-#make all
-#echo "Done"
-
-MAX_PACKS=10000000
-
-num_sockets=2
-num_threads_per_socket=2
-num_clients=4
+MAX_PACKS=1000000
+repetitions=50
 num_port=1820
+threads="1 2 4 8 16 24 32 48 64 72 96 128"
+num_clients=4
 
-#./server --verbose --cpudistributed --packets $MAX_PACKS --threads $num_threads --port $num_port &
-#./server --verbose --packets $MAX_PACKS --threads $num_threads --port $num_port --reuseport &
 
-#pid=$!
+echo "Compilando..."
+make all
+echo "Done"
 
-for ((i=1 ; $i<=$num_sockets ; i++))
-{
-	./server --scheduler numaPairSched --packets $(($MAX_PACKS/num_sockets)) --threads $num_threads_per_socket --port $num_port --reuseport  &
-}
+#Sin processor Affinity
+salida=SinProcessorAffinity
+for num_threads in $threads
+do
+	echo "evaluando "$num_threads" threads, "$salida
+	linea="$num_threads,";
 
-sleep 1
+	for ((i=1 ; $i<=$repetitions ; i++))
+	{
+		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads
+		
+		linea="$linea$(cat aux)"
+		rm aux
+	}
 
-# for i in $(pgrep server); do ps -mo pid,tid,fname,user,psr,sgi_p,%cpu,c,class,sched,wchan -p $i;done > scan.txt
-#while true; do ps -mo pid,tid,fname,user,psr,sgi_p,%cpu,c,class,sched,state,stat,wchan -p $pid >> scan.txt; done &
-#scannPID=$!
+	echo "$linea" >> $salida".csv"
+done
 
-# meanning of the cols in scan.txt
-# pid:	process ID number of the process.
-# tid:	alias lwp: lwp (light weight process, or thread) ID of the lwp being reported. (alias spid, tid).
-# fname:(COMMAND) first 8 bytes of the base name of the process's executable file. The output in this column may contain spaces.
-# user:	effective user name. This will be the textual user ID, if it can be obtained and the field width permits, or a decimal representation otherwise.
-# psr:	processor that process is currently assigned to.
-# sgi_p:processor that the process is currently executing on. Displays "*" if the process is not currently running or runnable.
-# %cpu:	cpu utilization of the process in "##.#" format. Currently, it is the CPU time used divided by the time the process has been running (cputime/realtime ratio), expressed as a percentage. It will not add up to 100% unless you are lucky. (alias pcpu).
-# class:scheduling class of the process. (alias policy, cls). Field's possible values are:
-		#    -	not reported
-		#    TS	SCHED_OTHER
-		#    FF	SCHED_FIFO
-		#    RR	SCHED_RR
-		#    ?	unknown value
-# sched:scheduling policy of the process. The policies sched_other, sched_fifo, and sched_rr are respectively displayed as 0, 1, and 2
-# wchan:name of the kernel function in which the process is sleeping, a "-" if the process is running, or a "*" if the process is multi-threaded and ps is not displaying threads.
 
-for ((i=1 ; $i<=$num_clients ; i++))
-{
-	./client --packets $(($MAX_PACKS*10)) --ip 127.0.0.1 --port $num_port > /dev/null &
-}
+#Con processor Affinity equitative
+salida=EquitativeAffinity
+for num_threads in $threads
+do
+	echo "evaluando "$num_threads" threads, "$salida
+	linea="$num_threads,";
 
-#wait $pid
-#kill $scannPID
-wait $(pgrep 'server')
+	for ((i=1 ; $i<=$repetitions ; i++))
+	{
+		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads --scheduler equitativeSched
+		
+		linea="$linea$(cat aux)"
+		rm aux
+	}
 
-#make clean
+	echo "$linea" >> $salida".csv"
+done
+
+
+#Con processor Affinity dummy
+salida=DummyAffinity
+for num_threads in $threads
+do
+	echo "evaluando "$num_threads" threads, "$salida
+	linea="$num_threads,";
+
+	for ((i=1 ; $i<=$repetitions ; i++))
+	{
+		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads --scheduler dummySched
+		
+		linea="$linea$(cat aux)"
+		rm aux
+	}
+
+	echo "$linea" >> $salida".csv"
+done
+
+
+#Con processor Affinity pair
+salida=PairAffinity
+for num_threads in $threads
+do
+	echo "evaluando "$num_threads" threads, "$salida
+	linea="$num_threads,";
+
+	for ((i=1 ; $i<=$repetitions ; i++))
+	{
+		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads --scheduler pairSched
+		
+		linea="$linea$(cat aux)"
+		rm aux
+	}
+
+	echo "$linea" >> $salida".csv"
+done
+
+
+#Con processor Affinity Numa pair
+salida=NumaPairAffinity
+for num_threads in $threads
+do
+	echo "evaluando "$num_threads" threads, "$salida
+	linea="$num_threads,";
+
+	for ((i=1 ; $i<=$repetitions ; i++))
+	{
+		./runTest.sh $num_clients --packets $MAX_PACKS --port $num_port --threads $num_threads --scheduler numaPairSched
+		
+		linea="$linea$(cat aux)"
+		rm aux
+	}
+
+	echo "$linea" >> $salida".csv"
+done
+
+
+make clean
+echo "Done"
+
+
+#Compilar los resultados en un sólo csv para simplicidad
