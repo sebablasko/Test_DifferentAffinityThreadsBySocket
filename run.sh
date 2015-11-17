@@ -1,9 +1,9 @@
 #!/bin/bash
 
 MAX_PACKS=1000000
-repetitions=3
+repetitions=60
 num_port=1820
-threads="1 2 4"
+threads="1 2 4 8 16 24 32 64 128"
 num_clients=4
 
 
