@@ -213,7 +213,7 @@ int main(int argc, char **argv){
 				int j;
 				j = (i%2)==0 ? i : (i-1) + totalCPUs/2;
 				CPU_ZERO(&cpus);
-				CPU_SET((i%2)*totalCPUs/2, &cpus);
+				CPU_SET(j%totalCPUs, &cpus);
 				pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
 				pthread_create(&pids[i], &attr, llamadaHilo, socket_fd);
 		}else{
